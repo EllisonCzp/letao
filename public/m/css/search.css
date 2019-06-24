@@ -1,0 +1,118 @@
+/* 整个 search的样式 */
+
+
+/* 搜索框模块 */
+
+.xt_search {
+    width: 100%;
+    padding: 10px;
+}
+
+.xt_search form {
+    position: relative;
+}
+
+.xt_search form input {
+    width: 100%;
+    height: 30px;
+    line-height: 28px;
+    border: 1px solid #069;
+    border-radius: 5px;
+    font-size: 12px;
+    background-color: #fff;
+    text-align: left;
+    padding: 0;
+    padding-left: 10px;
+}
+
+.xt_search form a {
+    position: absolute;
+    width: 60px;
+    height: 30px;
+    top: 0;
+    right: 0;
+    background-color: #069;
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+    line-height: 30px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+
+/* 排序模块 */
+
+.xt_order {
+    width: 100%;
+    height: 30px;
+    background-color: #efeff4;
+}
+
+.xt_order a {
+    float: left;
+    width: 25%;
+    height: 100%;
+    line-height: 30px;
+    text-align: center;
+    font-size: 12px;
+}
+
+.xt_order a.active {
+    color: rgb(211, 57, 57);
+}
+
+
+/* 商品模块 */
+
+.xt_product {
+    width: 100%;
+    padding: 0 10px;
+}
+
+.xt_product .xt_pro_item {
+    float: left;
+    width: 48%;
+    box-shadow: 0 0 3px #ccc;
+    margin-top: 10px;
+    text-align: center;
+    padding: 10px 0;
+}
+
+.xt_product .xt_pro_item:nth-of-type(2n) {
+    margin-left: 4%;
+}
+
+.xt_product .xt_pro_item a {
+    width: 100%;
+    display: block;
+}
+
+.xt_product .xt_pro_item a img {
+    display: block;
+    width: 100%;
+}
+
+.xt_product .xt_pro_item p {
+    font-size: 14px;
+    padding: 0 5px;
+    margin: 0;
+}
+
+.xt_product .xt_pro_item span {
+    font-size: 12px
+}
+
+.xt_product .xt_pro_item .old_price {
+    color: #aaa;
+    text-decoration: line-through;
+}
+
+.xt_product .xt_pro_item .new_price {
+    color: red;
+}
+
+.xt_product .xt_pro_item button {
+    background-color: #069;
+    color: #fff;
+}
