@@ -9,6 +9,10 @@ $(function() {
             return false;
         }
         // 合法就跳转
-        location.href = './searchList.html?key' + key;
+        location.href = './searchList.html?key=' + key;
+        // localStorage.setItem('myCat', key);
+        // console.log(localStorage.getItem('myCat'));
+
+
     });
 })

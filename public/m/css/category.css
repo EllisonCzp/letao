@@ -1,6 +1,7 @@
 .cate_left {
     float: left;
     width: 90px;
+    overflow: hidden;
 }
 
 .cate_left ul {
