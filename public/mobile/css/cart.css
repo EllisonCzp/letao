@@ -1,12 +1,12 @@
 [data-product] input,
-[data-product] .novalidate
-{
+[data-product] .novalidate {
     position: absolute;
     left: 20px;
     bottom: 10px;
     font-size: 12px;
 }
-[data-product] .name{
+
+[data-product] .name {
     height: 40px;
     line-height: 20px;
     width: 100%;
@@ -14,28 +14,34 @@
     white-space: normal;
     color: #666;
 }
-[data-product] .price{
+
+[data-product] .price {
     color: #ff3300;
 }
-[data-product] .oldPrice{
+
+[data-product] .oldPrice {
     font-size: 12px;
     color: #ccc;
     text-decoration: line-through;
 }
-[data-product] .size{
+
+[data-product] .size {
     font-size: 12px;
 }
-[data-product] .number{
+
+[data-product] .number {
     float: right;
     margin-right: 10px;
     font-size: 12px;
 }
+
 .mui-table-view .mui-media-object {
+    line-height: 60px;
     max-width: 60px;
-    width: 60px;
     height: 60px;
 }
-.cart_order{
+
+.cart_order {
     height: 30px;
     line-height: 30px;
     border-top: 1px solid #ccc;
@@ -50,7 +56,8 @@
     color: #ff3300;
     font-weight: 600;
 }
-.cart_order a{
+
+.cart_order a {
     width: 100px;
     text-align: center;
     background: #ff3300;
@@ -58,33 +65,40 @@
     float: right;
     color: #fff;
 }
-.cz_layout{
+
+.cz_layout {
     background: #fff;
 }
-.cz_container{
+
+.cz_container {
     padding-bottom: 80px;
     width: 100%;
     height: 100%;
 }
-.cz_container .mui-scroll-wrapper{
+
+.cz_container .mui-scroll-wrapper {
     width: 100%;
     height: 100%;
     overflow: hidden;
     position: relative;
 }
-.mui-table-view > ul{
+
+.mui-table-view>ul {
     margin: 0;
     padding: 0;
 }
 
-.cart_update{
+.cart_update {
     text-align: left;
 }
-.p_number{
+
+.p_number {
     padding: 5px;
     font-size: 14px;
 }
-.p_number .jian,.p_number .jia{
+
+.p_number .jian,
+.p_number .jia {
     width: 28px;
     height: 28px;
     line-height: 28px;
@@ -94,7 +108,8 @@
     border: 1px solid #ccc;
     vertical-align: middle;
 }
-.p_number input{
+
+.p_number input {
     width: 28px;
     height: 28px;
     line-height: 28px;
@@ -108,11 +123,13 @@
     vertical-align: middle;
     text-align: center;
 }
-.p_size{
+
+.p_size {
     padding: 5px;
     font-size: 14px;
 }
-.p_size .btn_size{
+
+.p_size .btn_size {
     width: 28px;
     height: 28px;
     line-height: 28px;
@@ -123,6 +140,13 @@
     vertical-align: middle;
     margin-bottom: 10px;
 }
-.p_size .btn_size.now{
+
+.p_size .btn_size.now {
     background: #fa672d;
+}
+
+.ct_container .ct_content {
+    padding: 45px 0 80px 0;
+    width: 100%;
+    height: 100%;
 }

@@ -1,156 +1,191 @@
-/**
- * ITCAST WEB
- * Created by zhousg on 2017/1/2.
- */
-$(function(){
+$(function() {
+    // 区域滚动
     mui('.mui-scroll-wrapper').scroll({
-        scrollY: true, //是否竖向滚动
-        scrollX: false, //是否横向滚动
-        startX: 0, //初始化时滚动至x
-        startY: 0, //初始化时滚动至y
-        indicators: false, //是否显示滚动条
-        deceleration:0.0006, //阻尼系数,系数越小滑动越灵敏
-        bounce: true //是否启用回弹
+        deceleration: 0.0005, //flick 减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
+        indicators: false
     });
+    /*初始化上下拉*/
     mui.init({
         pullRefresh: {
-            container: '.mui-scroll-wrapper',
+            container: "#refreshContainer",
             down: {
-                auto:true,
-                callback: function(){
+                auto: true,
+                callback: function() {
+                    /*1.初始化页面  自动下拉刷新*/
                     var that = this;
-                    /*获取数据*/
-                    getCartData(function(data){
-                        that.endPulldownToRefresh();
-                        /*渲染*/
-                        window.data = data;
-                        $('#cart_box').html(template('cartTpl',{model:window.data}));
-                    });
+                    setTimeout(function() {
+                        // 渲染数据
+                        getCartData(function(data) {
+                            if (data.length) {
+                                $('.mui-table-view').html(template('cart', data));
+                            } else {
+                                mui.toast('购物车没有商品，去首页逛逛吧');
+                            }
+
+                            /*加载状态隐藏*/
+                            that.endPulldownToRefresh();
+
+                            // 注册点击刷新事件  防止多次绑定
+                            $('.fa-refresh').off('tap').on('tap', function() {
+                                that.pulldownLoading();
+                            })
+                        });
+                    }, 1000);
                 }
             }
         }
     });
-    $('body').on('tap','.mui-btn-red',function() {
-        var li = this.parentNode.parentNode;
-        var $this = $(this);
-        mui.confirm('你要删除这件商品吗？', '温馨提示', ['确定', '取消'], function(e) {
+    // 侧滑 点击编辑按钮 弹出对话框
+    $('.mui-table-view').on('tap', '.mui-icon-compose', function() {
+        // 获取当前id
+        var id = $(this).parent().data('id');
+        // 根据id去获取缓存数据
+        var item = XT.getDataById(window.cartData.data, id);
+        // 弹窗的内容
+        var html = template('edit', item);
+        mui.confirm(html.replace(/\n/g, ''), '商品编辑', ['确定', '取消'], function(e) {
+            // 确认
             if (e.index == 0) {
-                deleteCartData({id:$this.attr('data-id')},function(data){
-                    if(data.success){
-                        li.parentNode.removeChild(li);
-                        setAmount();
-                    }else{
-                        mui.toast(data.message);
+                // 发送请求
+                var size = $('.btn_size.now').html();
+                var num = $('.p_number input').val();
+                XT.loginAjax({
+                    type: 'post',
+                    url: '/cart/updateCart',
+                    data: {
+                        id: id,
+                        size: size,
+                        num: num
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.success == true) {
+                            // 列表更新
+                            // item 与 window.cartData.data缓存数据 指向相同  item 更改 缓存数据 同样更改
+                            item.size = size;
+                            item.num = num;
+
+                            // 渲染页面
+                            $('.mui-table-view').html(template('cart', window.cartData));
+                            mui.toast('修改成功');
+                            setAmount();
+                        }
                     }
                 });
-            } else {
-                mui.swipeoutClose(li);
+
+            } else { //取消
+                // TODO
+
             }
-        })
-    }).on('tap','.mui-btn-blue', function(e) {
-        //修复iOS 8.x平台存在的bug，使用plus.nativeUI.prompt会造成输入法闪一下又没了
-        e.detail.gesture.preventDefault();
+        });
+    });
+    //删除  弹出对话框
+    $('.mui-table-view').on('tap', '.mui-icon-trash', function() {
+        // 获取当前元素
+        var $this = $(this);
+        // 获取当前id
+        var id = $this.parent().data('id');
 
-        var li = this.parentNode.parentNode;
-
-        var item = LeTao.getObjectFromId(window.data,$(this).attr('data-id'));
-        var html = template('cartUpdateTpl',{model:item}).replace(/\n/g,' ');
-
-        console.log(html);
-        mui.confirm( html , '编辑商品',  ['确定', '取消'], function(e) {
+        // 删除对话框
+        mui.confirm('您是否删除该商品！', '商品删除', ['是', '否'], function(e) {
+            // 确认 删除
             if (e.index == 0) {
-                var params = {
-                    id:item.id,
-                    size:$('.mui-popup').find('.btn_size.now').html(),
-                    num:$('.mui-popup').find('.p_number input').val()
-                };
-                if(!params.size){
-                    mui.toast('请选择尺码');
-                    return false;
-                }
-                if(!params.num){
-                    mui.toast('请选择数量');
-                    return false;
-                }
-                updateCartData(params,function(data){
-                    if(data.success){
-                        mui.toast('编辑成功');
-                        mui.swipeoutClose(li);
-                        $.extend(item,params);
-                        $(li).find('.number').html('x'+params.num+'双');
-                        $(li).find('.size').html('鞋码：'+params.size);
-                        setAmount();
-                    }else{
-                        mui.toast(data.message);
+
+                XT.loginAjax({
+                    type: 'get',
+                    url: '/cart/deleteCart',
+                    data: {
+                        id: id
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.success == true) {
+                            //    删除数据
+                            $this.parent().parent().remove();
+                            mui.toast('删除成功');
+                            setAmount();
+                        }
                     }
                 });
-            } else {
-                mui.swipeoutClose(li);
-            }
-        })
-    }).on('tap','.icon_refresh',function(){
-        /*刷新*/
-        mui('.mui-scroll-wrapper').pullRefresh().pulldownLoading();
-    }).on('tap','.btn_size',function(){
-        var $this = $(this);
-        $('.btn_size').removeClass('now');
-        $this.addClass('now');
 
-    }).on('tap','.p_number span',function(){
-        var $this = $(this),$input = $('.p_number input');
-        var num = parseInt($input.val()),max = $input.attr('data-max');
-        if($this.hasClass('jian')){
-            num >0 && $input.val(num-1);
-        }
-        if($this.hasClass('jia')){
-            if(num < max){
-                $input.val(num+1);
-            }else{
-                mui.toast('没有库存了');
+            } else { //取消
+                // TODO
+
             }
+        });
+    });
+    // 尺码编辑
+    $('body').off('tap').on('tap', '.btn_size', function() {
+        $(this).addClass('now').siblings().removeClass('now');
+    });
+    // 数量编辑
+    $('body').on('tap', '.p_number span', function() {
+        var $input = $(this).siblings('input');
+        var currNum = $input.val();
+        var maxNum = $input.data('max');
+        if ($(this).hasClass('jian')) {
+            if (currNum <= 1) {
+                mui.toast('至少需要一件商品');
+                return false;
+            }
+            currNum--;
+        } else {
+            if (currNum >= maxNum) {
+                mui.toast('库存不足');
+                return false
+            }
+            currNum++;
         }
-    }).on('change','input[type="checkbox"]',function(){
+        $input.val(currNum);
+    });
+
+    // 复选框 状态改变  计算总金额
+    $('.mui-table-view').on('change', '[type=checkbox]', function() {
+
         setAmount();
     });
+
 });
-var getCartData = function(callback){
-    LeTao.ajax({
-        type:'get',
-        url:'/cart/queryCart',
-        dataType:'json',
-        success:function(data){
-            callback && callback(data);
-        }
+
+// 设置总金额
+var setAmount = function() {
+    // 总金额 = 商品数量 * 商品单价 的总和
+    // 所有选中的复选框
+    var $checkbox = $('[type=checkbox]:checked');
+    // 总金额
+    var amountSum = 0;
+    // 遍历所有选中的复选框
+    $checkbox.each(function(i, item) {
+        // 获取每个复选框对应的商品id
+        var id = $(this).data('id');
+        // 获取对应id的数据
+        var item = XT.getDataById(window.cartData.data, id);
+        // 商品数量
+        var num = item.num;
+        // 商品单价
+        var price = item.price;
+        amountSum += num * price;
     });
-};
-var deleteCartData = function(params,callback){
-    LeTao.ajax({
-        type:'get',
-        url:'/cart/deleteCart',
-        dataType:'json',
-        data:params,
-        success:function(data){
-            callback && callback(data);
-        }
-    });
-};
-var updateCartData = function(params,callback){
-    LeTao.ajax({
-        type:'post',
-        url:'/cart/updateCart',
-        data:params,
-        dataType:'json',
-        success:function(data){
-            callback && callback(data);
-        }
-    });
-};
-var setAmount = function(){
-    var amount = 0;
-    var checkPro = $('input:checked');
-    for(var i = 0 ; i < checkPro.length ; i ++){
-        var product = LeTao.getObjectFromId(window.data,$(checkPro[i]).attr('data-id'));
-        amount += product.price*product.num;
+    amountSum = Math.floor(amountSum * 100) / 100;
+    if ((Math.floor(amountSum * 100) % 10 == 0)) {
+        amountSum = amountSum.toString() + '0';
     }
-    $('#cartAmount').html(Math.ceil(amount*100)/100);
-};
+    $('#cartAmount').html(amountSum);
+}
+
+// 获取购物车数据
+var getCartData = function(callback) {
+    XT.loginAjax({
+        type: "get",
+        url: "/cart/queryCartPaging",
+        data: { page: 1, pageSize: 100 },
+        dataType: "json",
+        success: function(data) {
+            // 缓存数据
+            window.cartData = data;
+
+            callback && callback(data);
+        }
+    });
+
+}
